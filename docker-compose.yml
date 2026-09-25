@@ -1,0 +1,20 @@
+services:
+  api:
+    build: .
+    ports:
+      - "7860:7860"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATA_DIR: /app/data
+    volumes:
+      # Dữ liệu, cache LLM, log và Qdrant local nằm trên máy, không mất khi dựng lại container.
+      # Qdrant local khóa thư mục: tắt service này trước khi chạy script nhập dữ liệu.
+      - ./data:/app/data
+      # Cache mô hình Hugging Face (bge-m3, reranker) để build lại không phải tải lại.
+      - hf-cache:/home/app/.cache/huggingface
+    restart: unless-stopped
+
+volumes:
+  hf-cache:
